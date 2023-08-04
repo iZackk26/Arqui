@@ -96,7 +96,10 @@ func (c *CPU) run() {
 		if instruction == 0 {
 			break
 		}
-		c.execute(instruction)
+        err := c.execute(instruction)
+        if err != nil {
+            fmt.Println(err)
+        }
 		fmt.Printf("Instruction: %d\n", instruction)
 		c.print()
 	}
@@ -173,7 +176,54 @@ func (c *CPU) execute(instruction int64) error {
 		}
 		c.accumulator *= c.memory[memory]
 		binary.Read(c.instructions, binary.LittleEndian, &memory)
-
+    case 8:
+        // Sum two memory locations and store in memory 1
+        var memory1 int64
+        var memory2 int64
+        err := binary.Read(c.instructions, binary.LittleEndian, &memory1)
+        if err != nil {
+            return err
+        }
+        err = binary.Read(c.instructions, binary.LittleEndian, &memory2)
+        if err != nil {
+            return err
+        }
+        c.memory[memory1] += c.memory[memory2]
+    case 9:
+        // Multiply memory 1 by accumulator and store in memory 2
+        var memory1 int64
+        var memory2 int64
+        err := binary.Read(c.instructions, binary.LittleEndian, &memory1)
+        if err != nil {
+            return err
+        }
+        err = binary.Read(c.instructions, binary.LittleEndian, &memory2)
+        if err != nil {
+            return err
+        }
+        c.memory[memory2] = c.memory[memory1] * c.accumulator
+    case 10:
+        // Divide accumulator by memory 1 and store it en accumulator
+        var memory int64
+        err := binary.Read(c.instructions, binary.LittleEndian, &memory)
+        if err != nil {
+            return err
+        }
+        c.accumulator /= c.memory[memory]
+        
+    case 11:
+        // Divide the accumulator by memory 1 and store it in memory 2
+        var memory1 int64
+        var memory2 int64
+        err := binary.Read(c.instructions, binary.LittleEndian, &memory1)
+        if err != nil {
+            return err
+        }
+        err = binary.Read(c.instructions, binary.LittleEndian, &memory2)
+        if err != nil {
+            return err
+        }
+        c.memory[memory2] = c.accumulator / c.memory[memory1]
 	default:
 		return fmt.Errorf("Unknown instruction: %d", instruction)
 
