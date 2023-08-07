@@ -40,22 +40,6 @@ func (c *CPU) loadInstructions(filename string) error {
 	return nil
 }
 
-func (c *CPU)dumpMemory(filename string) {
-    file, err := os.Create(filename) // If file already exists, it will be truncated
-    if err != nil {
-        fmt.Println(err)
-    }
-    defer file.Close()
-    for i := 0; i < len(c.memory); i++ {
-        if c.memory[i] != 0 {
-            fmt.Fprintf(file, "%b %b\n", i, c.memory[i]) // B means binary
-        }
-    }
-}
-
-
-
-
 func (c *CPU) loadMemory(filename string) error {
 	var memory [2048]int64
 	file, err := os.Open(filename)
@@ -262,6 +246,5 @@ func main() {
 	}
 	cpu.print()
 	cpu.run()
-    cpu.dumpMemory("pichaNiggerdog.txt")
 
 }
