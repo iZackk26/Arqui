@@ -53,9 +53,6 @@ func (c *CPU)dumpMemory(filename string) {
     }
 }
 
-
-
-
 func (c *CPU) loadMemory(filename string) error {
 	var memory [2048]int64
 	file, err := os.Open(filename)
@@ -96,6 +93,7 @@ func (c *CPU) printMemory() {
 		}
         // fmt.Printf("Memory[%d]: %d\n", i, c.memory[i]) 
 	}
+    // fmt.Printf("Memory[]: %v\n", c.memory) Mostrar esto
 }
 
 func (c *CPU) print() {
@@ -262,6 +260,6 @@ func main() {
 	}
 	cpu.print()
 	cpu.run()
-    cpu.dumpMemory("pichaNiggerdog.txt")
+    cpu.dumpMemory("Test.txt")
 
 }
