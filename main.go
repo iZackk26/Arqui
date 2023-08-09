@@ -12,7 +12,7 @@ import (
 type CPU struct {
 	accumulator  int64
 	instructions *bytes.Buffer
-	memory       [2048]int64
+	memory       [3000]int64
 }
 
 func (c *CPU) loadInstructions(filename string) error {
@@ -54,7 +54,7 @@ func (c *CPU)dumpMemory(filename string) {
 }
 
 func (c *CPU) loadMemory(filename string) error {
-	var memory [2048]int64
+	var memory [3000]int64
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -127,6 +127,7 @@ func (c *CPU) execute(instruction int64) error {
 		if err != nil {
 			return err
 		}
+        fmt.Println("Memory: ", c.memory[memory])
 		c.accumulator = c.memory[memory]
 		binary.Read(c.instructions, binary.LittleEndian, &memory) // skip empty bits
 
@@ -136,6 +137,7 @@ func (c *CPU) execute(instruction int64) error {
 		if err != nil {
 			return err
 		}
+        fmt.Println("Memory: ", memory, c.memory[memory])
 		c.memory[memory] = c.accumulator
 		binary.Read(c.instructions, binary.LittleEndian, &memory) // skip empty bits
 
@@ -145,6 +147,7 @@ func (c *CPU) execute(instruction int64) error {
 		if err != nil {
 			return err
 		}
+        fmt.Println("Memory: ", c.memory[memory])
 		c.accumulator += c.memory[memory]
 		binary.Read(c.instructions, binary.LittleEndian, &memory)
 	case 4:
@@ -158,6 +161,7 @@ func (c *CPU) execute(instruction int64) error {
 		if err != nil {
 			return err
 		}
+        fmt.Println("Memory: ", c.memory[memory1], c.memory[memory2])
 		c.accumulator += c.memory[memory1] + c.memory[memory2]
 
 	case 5:
@@ -166,6 +170,7 @@ func (c *CPU) execute(instruction int64) error {
 		if err != nil {
 			return err
 		}
+        fmt.Println("Memory: ", c.memory[memory])
 		c.accumulator -= c.memory[memory]
 		binary.Read(c.instructions, binary.LittleEndian, &memory)
 
@@ -180,6 +185,7 @@ func (c *CPU) execute(instruction int64) error {
 		if err != nil {
 			return err
 		}
+        fmt.Println("Memory: ", c.memory[memory1], c.memory[memory2])
 		c.memory[memory2] = c.accumulator - c.memory[memory1]
 
 	case 7:
@@ -188,6 +194,7 @@ func (c *CPU) execute(instruction int64) error {
 		if err != nil {
 			return err
 		}
+        fmt.Println("Memory: ", c.memory[memory])
 		c.accumulator *= c.memory[memory]
 		binary.Read(c.instructions, binary.LittleEndian, &memory)
     case 8:
@@ -202,6 +209,7 @@ func (c *CPU) execute(instruction int64) error {
         if err != nil {
             return err
         }
+        fmt.Println("Memory: ", c.memory[memory1], c.memory[memory2])
         c.memory[memory1] += c.memory[memory2]
     case 9:
         // Multiply memory 1 by accumulator and store in memory 2
@@ -215,6 +223,7 @@ func (c *CPU) execute(instruction int64) error {
         if err != nil {
             return err
         }
+        fmt.Println("Memory: ", c.memory[memory1], c.memory[memory2])
         c.memory[memory2] = c.memory[memory1] * c.accumulator
     case 10:
         // Divide accumulator by memory 1 and store it en accumulator
@@ -223,7 +232,12 @@ func (c *CPU) execute(instruction int64) error {
         if err != nil {
             return err
         }
+        fmt.Println("Memory: ", c.memory[memory])
+        if c.memory[memory] == 0 {
+            c.accumulator = 0
+        } else {
         c.accumulator /= c.memory[memory]
+        }
         
     case 11:
         // Divide the accumulator by memory 1 and store it in memory 2
@@ -237,7 +251,12 @@ func (c *CPU) execute(instruction int64) error {
         if err != nil {
             return err
         }
+        fmt.Println("Memory: ", c.memory[memory1], c.memory[memory2])
+        if c.memory[memory1] == 0 {
+            c.memory[memory2] = 0
+        } else {
         c.memory[memory2] = c.accumulator / c.memory[memory1]
+    }
 	default:
 		return fmt.Errorf("Unknown instruction: %d", instruction)
 
@@ -253,7 +272,7 @@ func main() {
 		fmt.Println("Error: ", err)
 		return
 	}
-	err = cpu.loadMemory("memory.txt")
+	err = cpu.loadMemory("memoryA.txt")
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
