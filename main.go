@@ -12,7 +12,7 @@ import (
 type CPU struct {
 	accumulator  int64
 	instructions *bytes.Buffer
-	memory       [3000]int64
+	memory       [3064]int64
 }
 
 func (c *CPU) loadInstructions(filename string) error {
@@ -54,7 +54,7 @@ func (c *CPU)dumpMemory(filename string) {
 }
 
 func (c *CPU) loadMemory(filename string) error {
-	var memory [3000]int64
+	var memory [3064]int64
 	file, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -127,7 +127,7 @@ func (c *CPU) execute(instruction int64) error {
 		if err != nil {
 			return err
 		}
-        fmt.Println("Memory: ", c.memory[memory])
+        fmt.Println("Memory: ", c.memory[memory]) // Print memory
 		c.accumulator = c.memory[memory]
 		binary.Read(c.instructions, binary.LittleEndian, &memory) // skip empty bits
 
@@ -170,7 +170,7 @@ func (c *CPU) execute(instruction int64) error {
 		if err != nil {
 			return err
 		}
-        fmt.Println("Memory: ", c.memory[memory])
+        fmt.Println("Memory: ", c.memory[memory]) // Print memory
 		c.accumulator -= c.memory[memory]
 		binary.Read(c.instructions, binary.LittleEndian, &memory)
 
@@ -194,8 +194,8 @@ func (c *CPU) execute(instruction int64) error {
 		if err != nil {
 			return err
 		}
-        fmt.Println("Memory: ", c.memory[memory])
-		c.accumulator *= c.memory[memory]
+        fmt.Println("Memory: ", memory, c.memory[memory]) // Print memory
+		c.accumulator = c.accumulator * c.memory[memory]
 		binary.Read(c.instructions, binary.LittleEndian, &memory)
     case 8:
         // Sum two memory locations and store in memory 1
@@ -233,11 +233,9 @@ func (c *CPU) execute(instruction int64) error {
             return err
         }
         fmt.Println("Memory: ", c.memory[memory])
-        if c.memory[memory] == 0 {
-            c.accumulator = 0
-        } else {
         c.accumulator /= c.memory[memory]
-        }
+        binary.Read(c.instructions, binary.LittleEndian, &memory)
+        
         
     case 11:
         // Divide the accumulator by memory 1 and store it in memory 2
@@ -252,11 +250,7 @@ func (c *CPU) execute(instruction int64) error {
             return err
         }
         fmt.Println("Memory: ", c.memory[memory1], c.memory[memory2])
-        if c.memory[memory1] == 0 {
-            c.memory[memory2] = 0
-        } else {
         c.memory[memory2] = c.accumulator / c.memory[memory1]
-    }
 	default:
 		return fmt.Errorf("Unknown instruction: %d", instruction)
 
