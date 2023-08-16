@@ -136,11 +136,19 @@ func (c *CPU) fetch() int64 {
 }
 
 func (c *CPU) printMemory() {
-	for _, mem := range c.memory {
+	for idx, mem := range c.memory {
 		if mem != 0 {
-			fmt.Printf("memory: %v\n", mem)
+			fmt.Printf("Memory %v: %v\n", idx,mem)
 		}
 	}
+}
+
+func (c *CPU) printInputOuput() {
+    for idx, mem := range c.inputOuput {
+        if mem != 0 {
+            fmt.Printf("InputOuput %v: %v\n", idx,mem)
+        }
+    }
 }
 
 func (c *CPU) print() {
@@ -162,7 +170,7 @@ func (c *CPU) run() {
 		}
 		fmt.Println(instruction)
 		c.print()
-		c.dumpMemory("Output/memoryFile.txt")
+		c.dumpMemory("Output/memoryFileOutput.txt")
 	}
 }
 
